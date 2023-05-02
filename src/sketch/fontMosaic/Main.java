@@ -12,8 +12,7 @@ public class Main extends PApplet {
     private final int baseRect = 20;
     private int numH = width / baseRect;
     private int numV = width / baseRect;
-    private float force = 0.0f;
-
+    private final ArrayList<ArrayList<Float>> forceList = new ArrayList<>();
     //メイン関数
     public static void main(String[] args) {
         PApplet.main(new String[]{Main.class.getName()});
@@ -39,9 +38,16 @@ public class Main extends PApplet {
 
     @Override
     public void draw() {
-        force *= 0.92;
         drawRect();
 
+
+        for (int h = 0; h < numH; h++) {
+            for (int v = 0; v < numV; v++) {
+                float f = forceList.get(h).get(v);
+                float mappedDecay = random(0.7f,0.99f);
+                forceList.get(h).set(v, f * mappedDecay);
+            }
+        }
     }
 
     void createRandomValues() {
@@ -49,16 +55,23 @@ public class Main extends PApplet {
 
         for (int h = 0; h < numH; h++) {
             randomValues.add(new ArrayList<>());
+            forceList.add(new ArrayList<>());
             for (int v = 0; v < numV; v++) {
                 randomValues.get(h).add(random(0, seed) - seed / 2);
+                forceList.get(h).add(0.0f);
             }
         }
     }
 
     @Override
     public void mouseClicked() {
-        force = 5.0f;
         Collections.shuffle(randomValues);
+
+        for (int h = 0; h < numH; h++) {
+            for (int v = 0; v < numV; v++) {
+                forceList.get(h).set(v,random(4.5f,8.8f));
+            }
+        }
     }
 
     void drawRect() {
@@ -70,6 +83,7 @@ public class Main extends PApplet {
 
         for (int h = 0; h < numH; h++) {
             for (int v = 0; v < numV; v++) {
+                float force = forceList.get(h).get(v);
                 float random = randomValues.get(h).get(v) * force;
                 float randomSize = randomValues.get(h).get(v) * force;
 
